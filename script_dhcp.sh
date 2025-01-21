@@ -1,39 +1,36 @@
 #!/bin/bash
 
-# Função para exibir o menu
-mostrar_menu() {
+# Exibir Menu
+
+menu(){
     clear
-    echo "==============================="
-    echo "  Gerenciador de Servidor DHCP"
-    echo "==============================="
-    echo "1. Instalar o servidor DHCP"
-    echo "2. Remover o servidor DHCP"
-    echo "3. Configurar o servidor DHCP"
-    echo "4. Parar o serviço DHCP"
-    echo "5. Reiniciar o serviço DHCP"
-    echo "0. Sair"
-    echo "==============================="
+    echo
+    echo " --- Gerenciador DHCP ---"
+    echo
+    echo " (1) - Instalar DHCP"
+    echo " (2) - Configurar DHCP"
+    echo " (3) - Parar Serviço DHCP"
+    echo " (4) - Reiniciar Serviço DHCP"
+    echo " (5) - Verificar Status Serviço DHCP"
+    echo " (0) - Sair do Gerenciador"
+    echo
     echo -n "Escolha uma opção: "
+
 }
 
-# Função para instalar o servidor DHCP
-instalar_dhcp() {
-    echo "Instalando o servidor DHCP..."
-    apt-get update
-    apt-get install -y isc-dhcp-server
-    echo "Instalação concluída!"
+# Opção 1 - Instalar DHCP
+
+instalar(){
+    echo
+    echo "Instalando..."
+    sudo apt update
+    sudo apt upgrade -y
+    echo "Função concluída..."
 }
 
-# Função para remover o servidor DHCP
-remover_dhcp() {
-    echo "Removendo o servidor DHCP..."
-    apt-get remove --purge -y isc-dhcp-server
-    apt-get autoremove -y
-    echo "Servidor DHCP removido com sucesso!"
-}
+# Opção 2 - Configurar DHCP
 
-# Função para configurar o servidor DHCP
-configurar_dhcp() {
+configurar(){
     echo "Configurando o arquivo /etc/dhcp/dhcpd.conf..."
 
     # Verificar se o arquivo /etc/dhcp/dhcpd.conf existe
@@ -68,25 +65,24 @@ EOF
     # Reiniciar o serviço após a configuração
     systemctl restart isc-dhcp-server
     echo "Configuração aplicada com sucesso!"
+    echo "Função concluída..."
 }
 
-# Função para verificar o status do serviço DHCP
-verificar_status_servico() {
-    echo "Verificando o status do serviço DHCP..."
-    systemctl status isc-dhcp-server.service --no-pager
-}
+# Opção 3 - Parar serviço DHCP
 
-# Função para parar o serviço DHCP
-parar_dhcp() {
+parar() {
     echo "Parando o serviço DHCP..."
     systemctl stop isc-dhcp-server
-    echo "Serviço DHCP parado."
+    echo "Função concluída..."
 }
 
-# Função para reiniciar o serviço DHCP
-reiniciar_dhcp() {
+
+# Opção 4 - Reiniciar Serviço DHCP
+
+reiniciar() {
     echo "Reiniciando o serviço DHCP..."
     systemctl restart isc-dhcp-server
+
     # Verificar se o serviço reiniciou corretamente
     if [ $? -eq 0 ]; then
         echo "Serviço DHCP reiniciado com sucesso!"
@@ -99,36 +95,32 @@ reiniciar_dhcp() {
     fi
 }
 
-# Função para verificar a interface configurada
-verificar_interface_rede() {
-    INTERFACE_CONFIGURADA=$(grep "INTERFACESv4" /etc/default/isc-dhcp-server | cut -d'=' -f2 | tr -d ' "')
+# Opção 5 - Verificar Status DHCP
 
-    if [ -z "$INTERFACE_CONFIGURADA" ]; then
-        echo "Erro: Nenhuma interface de rede configurada no arquivo /etc/default/isc-dhcp-server!"
-        echo "Verifique e configure a variável INTERFACESv4 corretamente."
-        exit 1
-    else
-        echo "A interface de rede configurada é: $INTERFACE_CONFIGURADA"
-    fi
+status() {
+    echo "Verificando o status do serviço DHCP..."
+    systemctl status isc-dhcp-server.service --no-pager
 }
 
-# Função principal para rodar o menu
-opcao_selecionada() {
+
+
+# Seleção para rodar o menu
+opcao() {
     case $1 in
         1)
-            instalar_dhcp
+            instalar
             ;;
         2)
-            remover_dhcp
+            configurar
             ;;
         3)
-            configurar_dhcp
+            parar
             ;;
         4)
-            parar_dhcp
+            reiniciar
             ;;
         5)
-            reiniciar_dhcp
+            status
             ;;
         0)
             echo "Saindo..."
@@ -140,10 +132,12 @@ opcao_selecionada() {
     esac
 }
 
-# Loop para exibir o menu
+# Loop Menu
+
 while true; do
-    mostrar_menu
+    menu
     read opcao
-    opcao_selecionada $opcao
+    opcao $opcao
     read -p "Pressione [Enter] para continuar..."
 done
+
