@@ -11,7 +11,7 @@ mostrar_menu() {
     echo "3. Configurar o servidor DHCP"
     echo "4. Parar o serviço DHCP"
     echo "5. Reiniciar o serviço DHCP"
-    echo "6. Sair"
+    echo "0. Sair"
     echo "==============================="
     echo -n "Escolha uma opção: "
 }
@@ -130,7 +130,7 @@ opcao_selecionada() {
         5)
             reiniciar_dhcp
             ;;
-        6)
+        0)
             echo "Saindo..."
             exit 0
             ;;
